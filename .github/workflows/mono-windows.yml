@@ -107,12 +107,31 @@ jobs:
           Get-ChildItem ./
           cd ../
           Try {
+            echo "1) Last cmd success: $?  exit code: $LASTEXITCODE   error count: $($error.count)"
+            foreach ($err in $error) { $err | Get-Member }
             .\bin\godot.windows.opt.tools.64.mono.exe --generate-mono-glue modules/mono/glue
+            echo "2) Last cmd success: $?  exit code: $LASTEXITCODE   error count: $($error.count)"
+            foreach ($err in $error) { $err | Get-Member }
           } 
           Catch {
             echo $_.Exception
             Break
           }
+          Get-ChildItem ./modules/
+          Get-ChildItem ./modules/mono
+          Get-ChildItem ./modules/mono/glue
+          Get-ChildItem ../mono-build
+          Try {
+            cat D:\a\godot_voxel\godot_voxel\godot\modules\mono\SCsub
+          } Catch {}
+          $Error.Clear()
+          $LASTEXITCODE=0
+
+      # Make first exe available
+      - uses: actions/upload-artifact@v2
+        with:
+          name: godot.windows.opt.tools.64.mono.preglue
+          path: godot/bin/*
 
       # We should always be explicit with our flags usage here since it's gonna be sure to always set those flags
       - name: Compilation
